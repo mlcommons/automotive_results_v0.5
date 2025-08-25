@@ -1,4 +1,4 @@
-See the HTML preview [here](https://htmlpreview.github.io/?https://github.com/mlcommons/submissions_automotive_v0.5/blob/refs/heads/main/closed/NVIDIA/results/Thor-X_TRT/summary.html)
+See the HTML preview [here](https://htmlpreview.github.io/?https://github.com/mlcommons/automotive_results_v0.5/blob/refs/heads/main/closed/NVIDIA/results/Thor-X_TRT/summary.html)
 <header class="topbar">
 <div class="topbar-container">
 <div class="logo">

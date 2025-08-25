@@ -1,4 +1,4 @@
-See the HTML preview [here](https://htmlpreview.github.io/?https://github.com/mlcommons/submissions_automotive_v0.5/blob/refs/heads/main/open/GATEOverflow/results/intel_spr_32c-reference-cpu-onnxruntime-default_config/summary.html)
+See the HTML preview [here](https://htmlpreview.github.io/?https://github.com/mlcommons/automotive_results_v0.5/blob/refs/heads/main/open/GATEOverflow/results/intel_spr_32c-reference-cpu-onnxruntime-default_config/summary.html)
 <header class="topbar">
 <div class="topbar-container">
 <div class="logo">
