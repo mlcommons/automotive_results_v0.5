@@ -1,0 +1,64 @@
+Start to convert detection format...
+Results writes to /tmp/tmp9ssgprtl/results/results_nusc.json
+======
+Loading NuScenes tables for version v1.0-trainval...
+23 category,
+8 attribute,
+4 visibility,
+64386 instance,
+12 sensor,
+10200 calibrated_sensor,
+2631083 ego_pose,
+68 log,
+850 scene,
+34149 sample,
+2631083 sample_data,
+1166187 sample_annotation,
+4 map,
+Done loading in 85.513 seconds.
+======
+Reverse indexing ...
+Done reverse indexing in 8.4 seconds.
+======
+Initializing nuScenes detection evaluation
+Loaded results from /tmp/tmp9ssgprtl/results/results_nusc.json. Found detections for 6019 samples.
+Loading annotations for val split from nuScenes version: v1.0-trainval
+Loaded ground truth annotations for 6019 samples.
+500
+Filtering predictions
+=> Original number of boxes: 1276093
+=> After distance based filtering: 1275582
+=> After LIDAR and RADAR points based filtering: 1275582
+=> After bike rack filtering: 1275225
+Filtering ground truth annotations
+=> Original number of boxes: 187528
+=> After distance based filtering: 134565
+=> After LIDAR and RADAR points based filtering: 121871
+=> After bike rack filtering: 121861
+Accumulating metric data...
+Calculating metrics...
+Saving metrics to: /tmp/tmp9ssgprtl/results
+mAP: 0.2673
+mATE: 0.8824
+mASE: 0.2877
+mAOE: 0.5957
+mAVE: 0.5733
+mAAE: 0.2071
+NDS: 0.3790
+Eval time: 108.8s
+
+Per-class results:
+Object Class	AP	ATE	ASE	AOE	AVE	AAE
+car	0.468	0.649	0.158	0.116	0.545	0.216
+truck	0.216	0.851	0.245	0.188	0.542	0.233
+bus	0.295	0.849	0.236	0.159	1.266	0.266
+trailer	0.057	1.186	0.260	0.614	0.286	0.048
+construction_vehicle	0.059	1.144	0.491	1.239	0.141	0.350
+pedestrian	0.339	0.821	0.300	0.836	0.620	0.256
+motorcycle	0.237	0.840	0.291	0.773	0.860	0.261
+bicycle	0.231	0.798	0.269	1.261	0.327	0.027
+traffic_cone	0.394	0.808	0.330	nan	nan	nan
+barrier	0.378	0.879	0.296	0.175	nan	nan
+mAP_3D:0.2672970244966856
+
+hash=a1b258d43fab14b5349700e26c855105182e3920381f39f614557f69ecc8a95b

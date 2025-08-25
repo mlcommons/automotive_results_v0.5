@@ -1,0 +1,64 @@
+Start to convert detection format...
+Results writes to /tmp/tmptjhv8z40/results/results_nusc.json
+======
+Loading NuScenes tables for version v1.0-trainval...
+23 category,
+8 attribute,
+4 visibility,
+64386 instance,
+12 sensor,
+10200 calibrated_sensor,
+2631083 ego_pose,
+68 log,
+850 scene,
+34149 sample,
+2631083 sample_data,
+1166187 sample_annotation,
+4 map,
+Done loading in 21.609 seconds.
+======
+Reverse indexing ...
+Done reverse indexing in 3.8 seconds.
+======
+Initializing nuScenes detection evaluation
+Loaded results from /tmp/tmptjhv8z40/results/results_nusc.json. Found detections for 6019 samples.
+Loading annotations for val split from nuScenes version: v1.0-trainval
+Loaded ground truth annotations for 6019 samples.
+500
+Filtering predictions
+=> Original number of boxes: 1275786
+=> After distance based filtering: 1275246
+=> After LIDAR and RADAR points based filtering: 1275246
+=> After bike rack filtering: 1274910
+Filtering ground truth annotations
+=> Original number of boxes: 187528
+=> After distance based filtering: 134565
+=> After LIDAR and RADAR points based filtering: 121871
+=> After bike rack filtering: 121861
+Accumulating metric data...
+Calculating metrics...
+Saving metrics to: /tmp/tmptjhv8z40/results
+mAP: 0.2684
+mATE: 0.8802
+mASE: 0.2880
+mAOE: 0.6049
+mAVE: 0.5723
+mAAE: 0.2080
+NDS: 0.3788
+Eval time: 71.8s
+
+Per-class results:
+Object Class        	AP    	ATE   	ASE   	AOE   	AVE   	AAE   
+car                 	0.469 	0.649 	0.159 	0.117 	0.545 	0.217 
+truck               	0.217 	0.850 	0.245 	0.188 	0.538 	0.235 
+bus                 	0.297 	0.837 	0.233 	0.165 	1.313 	0.266 
+trailer             	0.064 	1.161 	0.262 	0.605 	0.287 	0.062 
+construction_vehicle	0.060 	1.162 	0.495 	1.257 	0.132 	0.343 
+pedestrian          	0.340 	0.820 	0.301 	0.839 	0.617 	0.260 
+motorcycle          	0.235 	0.834 	0.289 	0.797 	0.835 	0.253 
+bicycle             	0.233 	0.798 	0.267 	1.298 	0.312 	0.028 
+traffic_cone        	0.392 	0.813 	0.332 	nan   	nan   	nan   
+barrier             	0.377 	0.879 	0.296 	0.177 	nan   	nan   
+mAP_3D:0.26835540266874236
+
+hash=4117f342ad58a7c0724d7391ea6e2cfe75b19444a86781147e52eccaa2e87f98

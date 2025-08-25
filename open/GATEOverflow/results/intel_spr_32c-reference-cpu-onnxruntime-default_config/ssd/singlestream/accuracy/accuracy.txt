@@ -1,0 +1,21 @@
+mAP: 0.7180090546607971
+{   'classes': tensor([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14],
+       dtype=torch.int32),
+    'map': tensor(0.7180),
+    'map_50': tensor(0.9163),
+    'map_75': tensor(0.8084),
+    'map_large': tensor(0.7755),
+    'map_medium': tensor(0.7442),
+    'map_per_class': tensor([0.7648, 0.6618, 0.7537, 0.6752, 0.6682, 0.6978, 0.7293, 0.7866, 0.6892,
+        0.5671, 0.7006, 0.7303, 0.7655, 0.8620]),
+    'map_small': tensor(0.3673),
+    'mar_1': tensor(0.4703),
+    'mar_10': tensor(0.7317),
+    'mar_100': tensor(0.7551),
+    'mar_100_per_class': tensor([0.7939, 0.7043, 0.7814, 0.7126, 0.7162, 0.7389, 0.7682, 0.8200, 0.7276,
+        0.6226, 0.7410, 0.7677, 0.7919, 0.8851]),
+    'mar_large': tensor(0.8123),
+    'mar_medium': tensor(0.7770),
+    'mar_small': tensor(0.4062)}
+
+hash=a5388574244d154e14287702f727a8a36351b7f9ae31b0c6ea5f051d1e7bdf77

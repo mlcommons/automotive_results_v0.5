@@ -1,0 +1,8 @@
+
+Overall Acc: 0.985497
+Mean Acc: 0.969390
+FreqW Acc: 0.971653
+Mean IoU: 0.924355
+
+
+hash=33911643dbae13e729127cfcd2f3c318e878d24ddde5bd2a91d1f70221ba478c

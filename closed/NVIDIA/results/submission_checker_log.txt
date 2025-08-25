@@ -1,0 +1,26 @@
+[2025-07-11 15:54:06,334 log_parser.py:59 INFO] Sucessfully loaded MLPerf log from closed/NVIDIA/results/Thor-X_TRT/bevformer/ConstantStream/accuracy/mlperf_log_detail.txt.
+[2025-07-11 15:54:06,344 log_parser.py:59 INFO] Sucessfully loaded MLPerf log from closed/NVIDIA/results/Thor-X_TRT/bevformer/ConstantStream/performance/run_1/mlperf_log_detail.txt.
+[2025-07-11 15:54:06,352 log_parser.py:59 INFO] Sucessfully loaded MLPerf log from closed/NVIDIA/results/Thor-X_TRT/bevformer/ConstantStream/performance/run_1/mlperf_log_detail.txt.
+[2025-07-11 15:54:06,380 log_parser.py:59 INFO] Sucessfully loaded MLPerf log from closed/NVIDIA/results/Thor-X_TRT/bevformer/SingleStream/accuracy/mlperf_log_detail.txt.
+[2025-07-11 15:54:06,390 log_parser.py:59 INFO] Sucessfully loaded MLPerf log from closed/NVIDIA/results/Thor-X_TRT/bevformer/SingleStream/performance/run_1/mlperf_log_detail.txt.
+[2025-07-11 15:54:06,398 log_parser.py:59 INFO] Sucessfully loaded MLPerf log from closed/NVIDIA/results/Thor-X_TRT/bevformer/SingleStream/performance/run_1/mlperf_log_detail.txt.
+[2025-07-11 15:54:06,400 submission_checker.py:2159 INFO] ---
+[2025-07-11 15:54:06,400 submission_checker.py:2163 INFO] Results closed/NVIDIA/results/Thor-X_TRT/bevformer/ConstantStream 12.0
+[2025-07-11 15:54:06,400 submission_checker.py:2163 INFO] Results closed/NVIDIA/results/Thor-X_TRT/bevformer/SingleStream 5.209854
+[2025-07-11 15:54:06,400 submission_checker.py:2165 INFO] ---
+[2025-07-11 15:54:06,400 submission_checker.py:2254 INFO] ---
+[2025-07-11 15:54:06,400 submission_checker.py:2255 INFO] Results=2, NoResults=0, Power Results=0
+[2025-07-11 15:54:06,400 submission_checker.py:2262 INFO] ---
+[2025-07-11 15:54:06,400 submission_checker.py:2263 INFO] Closed Results=2, Closed Power Results=0
+
+[2025-07-11 15:54:06,400 submission_checker.py:2268 INFO] Open Results=0, Open Power Results=0
+
+[2025-07-11 15:54:06,400 submission_checker.py:2273 INFO] Network Results=0, Network Power Results=0
+
+[2025-07-11 15:54:06,400 submission_checker.py:2278 INFO] ---
+[2025-07-11 15:54:06,400 submission_checker.py:2280 INFO] Systems=1, Power Systems=0
+[2025-07-11 15:54:06,400 submission_checker.py:2284 INFO] Closed Systems=1, Closed Power Systems=0
+[2025-07-11 15:54:06,400 submission_checker.py:2289 INFO] Open Systems=0, Open Power Systems=0
+[2025-07-11 15:54:06,400 submission_checker.py:2294 INFO] Network Systems=0, Network Power Systems=0
+[2025-07-11 15:54:06,400 submission_checker.py:2299 INFO] ---
+[2025-07-11 15:54:06,400 submission_checker.py:2304 INFO] SUMMARY: submission looks OK

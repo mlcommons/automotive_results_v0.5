@@ -1,0 +1,70 @@
+================================================
+MLPerf Results Summary
+================================================
+SUT name : Server_BevFormer
+Scenario : ConstantStream
+Mode     : PerformanceOnly
+Completed samples per second    : 12.00
+99.9th percentile latency (ns) : 51841641
+Scheduled groups per second: 0.297493
+Completed groups per second: 0.30
+Result is : VALID
+  Performance constraints satisfied : Yes
+  Min duration satisfied : Yes
+  Min queries satisfied : Yes
+  Early stopping satisfied: Yes
+Early Stopping Result:
+ * Run successful.
+ * Early stopping 99.9th percentile estimate: 64436625
+ * Early stopping 99.0th percentile estimate: 5268082
+
+================================================
+Additional Stats
+================================================
+Scheduled samples per second : 12.00
+Min latency (ns)                : 5141340
+Max latency (ns)                : 106176227
+Mean latency (ns)               : 5307838
+50.00 percentile latency (ns)   : 5206125
+90.00 percentile latency (ns)   : 5234491
+95.00 percentile latency (ns)   : 5245150
+97.00 percentile latency (ns)   : 5251936
+99.00 percentile latency (ns)   : 5266928
+99.90 percentile latency (ns)   : 51841641
+Min group latency (ns)          : 207083151
+Max group latency (ns)          : 384205506
+Mean group latency (ns)         : 214104928
+50.00 group percentile latency (ns)   : 208667962
+90.00 group percentile latency (ns)   : 213985828
+95.00 group percentile latency (ns)   : 215154814
+97.00 group percentile latency (ns)   : 274562013
+99.00 group percentile latency (ns)   : 331807428
+99.90 group percentile latency (ns)   : 378419980
+
+================================================
+Test Parameters Used
+================================================
+samples_per_query : 1
+target_qps : 12
+target_latency (ns): 83333333
+target_latency_percentile : 0.999
+max_async_queries : 0
+min_duration (ms): 600000
+max_duration (ms): 0
+min_query_count : 100000
+max_query_count : 0
+qsl_rng_seed : 1575625098
+sample_index_rng_seed : 2227286192
+schedule_rng_seed : 3495234579
+accuracy_log_rng_seed : 0
+accuracy_log_probability : 0
+accuracy_log_sampling_target : 0
+print_timestamps : 0
+performance_issue_unique : 0
+performance_issue_same : 0
+performance_issue_same_index : 0
+performance_sample_count : 256
+
+1 warning encountered. See detailed log.
+
+No errors encountered during test.

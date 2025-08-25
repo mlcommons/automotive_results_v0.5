@@ -1,0 +1,7 @@
+{
+    "input_data_types": "int8",
+    "retraining": "No",
+    "starting_weights_filename": "bevformer_tiny.onnx",
+    "weight_data_types": "int8",
+    "weight_transformations": "quantization, affine fusion"
+}

@@ -1,0 +1,251 @@
+# Copyright (c) 2025, NVIDIA CORPORATION.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#	 http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ifndef MAKEFILE_DOCKER_INCLUDED
+MAKEFILE_DOCKER_INCLUDED := 1
+
+# This Makefile includes all the variables and targets used to set up NVIDIA's MLPerf Automotive docker environment
+include $(CURDIR)/Makefile.const
+include $(CURDIR)/Makefile.build
+
+USE_NIGHTLY ?= 0
+
+# Used in release process, Do not modify
+PARTNER_DROP ?= 0
+PARTNER_RELEASE := 0
+
+# Intranet returns zero, public network returns non zero
+# Force the EXTERNAL_USER to be 1 if the error code is other than 1
+EXTERNAL_USER ?= $(shell bash $(PROJECT_ROOT)/scripts/check_intranet.sh)
+ifeq ($(EXTERNAL_USER),0)
+    EXTERNAL_USER := 0
+else
+    EXTERNAL_USER := 1
+endif
+
+# Conditional Docker flags
+ifndef DOCKER_DETACH
+    DOCKER_DETACH := 0
+endif
+ifndef DOCKER_TAG
+    DOCKER_TAG := $(UNAME)-$(ARCH)
+endif
+
+DOCKER_BUILDKIT = 1
+HOST_VOL ?= ${PWD}
+CONTAINER_VOL ?= /work
+NO_DOCKER_PULL ?= 1
+
+
+# The below paths are for internal use only.
+# If any extra mounting path is needed, please use DOCKER_ARGS environment variables
+ifneq ($(wildcard /home/mlperf_automotive_data),)
+    DOCKER_MOUNTS += -v /home/mlperf_automotive_data:/home/mlperf_automotive_data
+endif
+ifneq ($(wildcard /raid/data),)
+    DOCKER_MOUNTS += -v /raid/data:/raid/data
+endif
+ifdef MLPERF_SCRATCH_PATH
+    ifneq ($(wildcard $(MLPERF_SCRATCH_PATH)),)
+        DOCKER_MOUNTS += -v $(MLPERF_SCRATCH_PATH):$(MLPERF_SCRATCH_PATH)
+    else
+        $(error Path set in MLPERF_SCRATCH_PATH does not exist!)
+    endif
+endif
+
+# Handle all docker environment variables
+DOCKER_ENV_VAR += -e NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES}
+DOCKER_ENV_VAR += -e HISTFILE=/mnt/${HOME}/.mlperf_bash_history
+# Forwarding ssh socket for git inside docker
+DOCKER_ENV_VAR += -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock
+DOCKER_ENV_VAR += -e MLPERF_SCRATCH_PATH=$(MLPERF_SCRATCH_PATH)
+DOCKER_ENV_VAR += -e HOST_HOSTNAME=$(HOSTNAME)
+ifdef CCACHE_DIR
+    DOCKER_MOUNTS += -v $(CCACHE_DIR):/home/$(UNAME)/.ccache
+    DOCKER_ENV_VAR += -e CCACHE_DIR=/home/$(UNAME)/.ccache
+endif
+
+# Handle different nvidia-docker version. Do not use nvidia-docker when running with CPUs
+ifneq ($(wildcard /usr/bin/nvidia-docker),)
+    DOCKER_RUN_CMD := nvidia-docker run
+    # Set Environment variables to fix docker client and server version mismatch
+    # Related issue: https://github.com/kubernetes-sigs/kubespray/issues/6160
+    export DOCKER_API_VERSION=1.40
+else
+    DOCKER_RUN_CMD := docker run --runtime=nvidia
+endif
+
+# If specific DOCKER_COMMAND is not passed, launch interactive docker container session.
+ifeq ($(DOCKER_COMMAND),)
+    DOCKER_INTERACTIVE_FLAGS = -it
+else
+    DOCKER_INTERACTIVE_FLAGS =
+endif
+
+
+# Docker container host name
+RANDOM := $(shell bash -c 'echo $$RANDOM')
+DOCKER_NAME := mlperf-automottive-$(DOCKER_TAG)-$(RANDOM)
+
+# As on SoC like Jetson, [PR #26618](https://github.com/moby/moby/issues/43419) prohibits `/sys/firmware/**`
+# from being accessed. Adding the `--security-opt systempaths=unconfined` docker argument allows
+# us to detect the embedded system model info by accessing `/sys/firmware/devicetree/base/model`
+ifeq ($(BUILD_CONTEXT), aarch64-SoC)
+    DOCKER_ARGS += --security-opt systempaths=unconfined
+endif
+
+
+# FIXME: jsuh - Not sure if these are really necessary; test and decide to keep them or not
+ifeq ($(BUILD_CONTEXT), aarch64-SoC)
+	DOCKER_ARGS += --privileged \
+        		   --ulimit stack=67108864 \
+        		   --ipc=host
+endif
+
+############################## DOCKER TAG / NAME ##############################
+# Dockerfile
+DOCKER_FILENAME := docker/$(ENV)/Dockerfile
+
+BASE_IMAGE_NAME ?= mlpauto-$(VERSION)-cuda$(CUDA_VER)-${BASE_IMAGE_ALIAS}-ubuntu$(UBUNTU_VERSION)-$(BUILD_CONTEXT)-$(ENV)
+
+ifeq ($(ENV), dev)
+# for nvidia internal dev only
+    SSH_AGENT_CMD = eval $$(ssh-agent -s) && ssh-add /home/${USER}/.ssh/* 2>/dev/null || true &&
+    CONTAINER_REGISTRY := gitlab-master.nvidia.com/adlsa/mlperf-automotive
+	# Base image from NGC pytorch
+	BASE_IMAGE_NAME = 25.03-py3-igpu
+	CONTAINER_REGISTRY = nvcr.io/nvidia/pytorch
+    DOCKER_BUILD_ARGS = \
+		--build-arg BASE_IMAGE=$(CONTAINER_REGISTRY):$(BASE_IMAGE_NAME) \
+		--build-arg ENV=$(ENV) \
+		--build-arg BUILD_CONTEXT=$(BUILD_CONTEXT) \
+		--build-arg USE_NIGHTLY=$(USE_NIGHTLY) \
+		--build-arg CUDA_VER=$(CUDA_VER) \
+		--build-arg TRT_MAJOR_VER=$(TRT_MAJOR_VER) \
+		--build-arg TRT_VER=$(TRT_VER) \
+		--build-arg MITTEN_HASH=$(MITTEN_DEV_HASH) \
+		--ssh default
+else ifeq ($(ENV), release)
+# for partner code drop and post submission general public code release
+    ifeq ($(PARTNER_DROP), 1)
+        BASE_IMAGE_NAME = mlpauto-$(VERSION).$(PARTNER_RELEASE)-cuda$(CUDA_VER)-${BASE_IMAGE_ALIAS}-ubuntu$(UBUNTU_VERSION)-$(BUILD_CONTEXT)-$(ENV)-partner
+        CONTAINER_REGISTRY := nvcr.io/mlperf/mlpauto-partner-$(subst .,,$(VERSION))/mlpauto-partner-$(subst .,,$(VERSION))
+    else
+		CONTAINER_REGISTRY := nvcr.io/nvidia/mlperf/mlperf-automotive
+    endif
+    DOCKER_BUILD_ARGS := --build-arg BASE_IMAGE=$(CONTAINER_REGISTRY):$(BASE_IMAGE_NAME) \
+		--build-arg ENV=$(ENV) \
+		--build-arg BUILD_CONTEXT=$(BUILD_CONTEXT) \
+		--build-arg MITTEN_HASH=$(MITTEN_PUBLIC_HASH) \
+else
+	$(error Only dev and release mode is currently supported.)
+endif
+
+
+# Check if the user is currently under NVIDIA intranet. External users should see 1.
+.PHONY: check_intranet
+check_intranet:
+	@echo "EXTERNAL_USER = $(EXTERNAL_USER)"
+
+# Small helper to check if nvidia-docker is installed correctly.
+.PHONY: docker_sanity
+docker_sanity:
+	docker pull nvcr.io/nvidia/cuda:12.8.1-runtime-ubuntu24.04
+	$(DOCKER_RUN_CMD) --rm \
+		-e NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES} \
+		nvcr.io/nvidia/cuda:12.8.1-runtime-ubuntu24.04 nvidia-smi
+	@echo "Nvidia-docker is installed correctly!"
+
+
+# Build the docker image and launch an interactive container.
+# For CPU builds, first build the backend libraries and copy them into the working directory
+.PHONY: prebuild
+prebuild: check_user_requirements
+	@$(MAKE) -f Makefile.docker build_docker
+ifneq ($(strip ${DOCKER_DETACH}), 1)
+	@$(MAKE) -f Makefile.docker attach_docker || true
+endif
+
+# UID 0 is reserved for the root user, which is not allowed to run the docker container.
+.PHONY: check_user_requirements
+check_user_requirements:
+	@if [ $(UID) -eq 0 ]; then \
+		echo "ERROR: User $(UNAME) has UID 0 (root). This is not allowed for security reasons."; \
+		exit 1; \
+	fi
+
+.PHONY: build_docker
+build_docker:
+	@echo "Building Docker image"
+ifeq ($(PARTNER_DROP), 1)
+	@echo "PARTNER_DROP: $(VERSION).$(PARTNER_RELEASE)"
+endif
+	@echo "BASE_IMAGE: $(BASE_IMAGE_NAME)"
+	@echo "DOCKER_FILENAME: $(DOCKER_FILENAME)"
+ifeq ($(NO_DOCKER_PULL), 0)
+	docker pull $(CONTAINER_REGISTRY):$(BASE_IMAGE_NAME)
+endif
+	@echo "DOCKER_BUILD_ARGS: $(DOCKER_BUILD_ARGS)"
+	@echo "ENV: $(ENV)"
+	$(SSH_AGENT_CMD) DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t mlperf-automotive:$(DOCKER_TAG)-base $(DOCKER_BUILD_ARGS) \
+		--network host --build-context common=docker/common \
+		-f $(DOCKER_FILENAME) docker/$(ENV)
+
+
+# Add current user into docker image.
+.PHONY: docker_add_user
+docker_add_user:
+	@echo "Adding user account into image"
+	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t mlperf-automotive:$(DOCKER_TAG) --network host \
+		--build-arg BASE_IMAGE=mlperf-automotive:$(DOCKER_TAG)-base \
+		--build-arg GID=$(GROUPID) --build-arg UID=$(UID) --build-arg GROUP=$(GROUPNAME) --build-arg USER=$(UNAME) \
+		- < docker/Dockerfile.user
+
+# Add user and launch an interactive container session.
+.PHONY: attach_docker
+attach_docker:
+	@$(MAKE) -f Makefile.docker docker_add_user
+	@$(MAKE) -f Makefile.docker launch_docker
+
+# Launch a container session.
+.PHONY: launch_docker
+launch_docker:
+	eval $$(ssh-agent -s) > /dev/null 2>&1 && \
+	$(DOCKER_RUN_CMD) --rm $(DOCKER_INTERACTIVE_FLAGS) -w /work \
+		-v $(realpath $(HOST_VOL)):$(CONTAINER_VOL) -v $(realpath ${HOME}):/mnt/${HOME} \
+		--cap-add SYS_ADMIN --cap-add SYS_TIME \
+		--shm-size=32gb \
+		--ulimit memlock=-1 \
+		-v $$SSH_AUTH_SOCK:/run/host-services/ssh-auth.sock \
+		-v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		--security-opt apparmor=unconfined --security-opt seccomp=unconfined \
+		--name $(DOCKER_NAME) -h $(subst _,-,$(shell echo $(DOCKER_NAME) | cut -c -64)) --add-host $(DOCKER_NAME):127.0.0.1 \
+		--cpuset-cpus $(shell taskset -c -p $$$$ | awk '{print $$NF}') \
+		--net host \
+		--device /dev/fuse \
+		--device /dev/tegra-soc-hwpm \
+		--device /dev/nvgpu \
+		$(DOCKER_ARGS) \
+		$(DOCKER_ENV_VAR) \
+		$(DOCKER_MOUNTS) \
+		--gpus all \
+		mlperf-automotive:$(DOCKER_TAG) $(DOCKER_COMMAND)
+
+#		--user $(UID) \
+#       $(shell if [ -n "$$MIG_CONF" ] && [ "$$MIG_CONF" = "ALL" ]; then echo "--gpus all -e NVIDIA_MIG_CONFIG_DEVICES=all"; elif [ -n "$$MIG_CONF" ] && [ "$$MIG_CONF" != "OFF" ]; then echo "--gpus '\"device=`bash scripts/mig_get_uuid.sh`\"'"; fi) \
+		
+# NOTE: ThorX docker cannot recognize CUDA device unless root hence disabling --user $(UID) here
+
+endif  # ifndef MAKEFILE_DOCKER_INCLUDED
